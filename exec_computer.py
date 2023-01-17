@@ -1,5 +1,5 @@
 import time
-from TD4 import TD4
+from td4 import TD4
 
 
 def exec(computer, switch):

@@ -1,5 +1,4 @@
 from logic_gate import AND, OR, NOT
-from decoder import decoder
 
 # SでA,Bから選択
 
@@ -14,16 +13,10 @@ def multiplexer(A, B, S):
 
 
 def multiplexer4(A, B, C, D, S1, S0):
-    S_A, S_B, S_C, S_D = decoder(S1, S0)
-    return OR(
-        OR(
-            AND(A, S_A),
-            AND(B, S_B)
-        ),
-        OR(
-            AND(C, S_C),
-            AND(D, S_D)
-        )
+    return multiplexer(
+        multiplexer(A, B, S0),
+        multiplexer(C, D, S0),
+        S1
     )
 
 # S3,S2,S1,S0でi0000~i1111から選択

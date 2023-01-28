@@ -84,11 +84,12 @@ class TD4():
             opecode
         )
         # アウトプットの計算
+        register_out_Q = self.register_out.get_Q()
         next_out = multiplexer16_4bit(
-            [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0],
-            [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0],
-            [0, 0, 0, 0], register_b_Q, [0, 0, 0, 0], imm,
-            [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0],
+            register_out_Q, register_out_Q, register_out_Q, register_out_Q,
+            register_out_Q, register_out_Q, register_out_Q, register_out_Q,
+            register_out_Q, register_b_Q, register_out_Q, imm,
+            register_out_Q, register_out_Q, register_out_Q, register_out_Q,
             opecode
         )
         # print

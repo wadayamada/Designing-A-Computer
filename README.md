@@ -2,7 +2,8 @@
 論理ゲートを使ってコンピュータを作ります
 
 ## 概要図
-<img width="729" alt="スクリーンショット 2023-01-29 3 47 34" src="https://user-images.githubusercontent.com/31792905/215285437-1548797f-ef25-40b1-ab16-c46dda9b5948.png">
+<img width="600" alt="スクリーンショット 2023-01-29 3 49 52" src="https://user-images.githubusercontent.com/31792905/215285512-3dde401e-c274-4438-a7f5-0c3d01ab97f6.png">
+
 
 ## 命令セット(TD4)
 |  opecode  |  アセンブラ  | 概要　|

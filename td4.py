@@ -1,5 +1,6 @@
 from dff import DFF
 from rom import ROM
+from multiplexer import multiplexer16, multiplexer
 
 
 class Computer:
@@ -11,10 +12,11 @@ class Computer:
         pass
 
     def input(self, switch):
-        self.switch = switch
+        self.switch = [int(s) for s in switch]
+        print("input      :", self.switch)
 
     def output(self):
-        print(self.LED)
+        print("output     :", self.LED)
 
 # とりあえず動作する4bitのコンピューター
 
@@ -49,7 +51,7 @@ class TD4(Computer):
         opecode = data[0:4]
         imm = data[4:8]
         # ALUで計算
-        next_a, next_b, next_cf, next_ip, next_out = self.ALU(opecode, imm, self.switch)
+        next_a, next_b, next_cf, next_ip, next_out = self.ALU(opecode, imm)
         for i in range(4):
             self.register_a[i].input(next_a[i])
             self.register_b[i].input(next_b[i])
@@ -57,10 +59,70 @@ class TD4(Computer):
             self.register_out[i].input(next_out[i])
         self.register_cf.input(next_cf)
 
-    def ALU(self, opecode, imm, switch):
-        next_a = [0, 0, 0, 0]
-        next_b = [0, 0, 0, 0]
-        next_cf = 0
-        next_ip = [0, 0, 0, 0]
-        next_out = [0, 0, 0, 0]
+    def ALU(self, opecode, imm):
+        # 汎用レジスタAの計算
+        register_a_Q = [i.Q for i in self.register_a]
+        cf_add_A_imm, result_add_A_imm = self.Add(register_a_Q, imm)
+        register_b_Q = [i.Q for i in self.register_b]
+        next_a = [
+            multiplexer16(
+                result_add_A_imm[i], register_b_Q[i], self.switch[i], imm[i],
+                register_a_Q[i], register_a_Q[i], register_a_Q[i], register_a_Q[i],
+                register_a_Q[i], register_a_Q[i], register_a_Q[i], register_a_Q[i],
+                register_a_Q[i], register_a_Q[i], register_a_Q[i], register_a_Q[i],
+                opecode[0], opecode[1], opecode[2], opecode[3]) for i in range(4)]
+        # 汎用レジスタBの計算
+        cf_add_B_imm, result_add_B_imm = self.Add(register_b_Q, imm)
+        next_b = [
+            multiplexer16(register_b_Q[i], register_b_Q[i], register_b_Q[i], register_b_Q[i],
+                          register_a_Q[i], result_add_B_imm[i], self.switch[i], imm[i],
+                          register_b_Q[i], register_b_Q[i], register_b_Q[i], register_b_Q[i],
+                          register_b_Q[i], register_b_Q[i], register_b_Q[i], register_b_Q[i],
+                          opecode[0], opecode[1], opecode[2], opecode[3]
+                          ) for i in range(4)
+        ]
+        # キャリーフラグ(CF)の計算
+        next_cf = multiplexer16(
+            cf_add_A_imm, 0, 0, 0, 0, cf_add_B_imm, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            opecode[0], opecode[1], opecode[2], opecode[3])
+        # 命令ポインタ(IP)の計算
+        ip_plus1_cf, ip_plus1_result = self.Add([i.Q for i in self.register_ip], [0, 0, 0, 1])
+        next_ip = [multiplexer16(
+            ip_plus1_result[i], ip_plus1_result[i], ip_plus1_result[i], ip_plus1_result[i],
+            ip_plus1_result[i], ip_plus1_result[i], ip_plus1_result[i], ip_plus1_result[i],
+            ip_plus1_result[i], ip_plus1_result[i], ip_plus1_result[i], ip_plus1_result[i],
+            ip_plus1_result[i], ip_plus1_result[i], multiplexer(imm[i], ip_plus1_result[i], self.register_cf.Q), imm[i],
+            opecode[0], opecode[1], opecode[2], opecode[3]) for i in range(4)
+        ]
+        # アウトプットの計算
+        next_out = [
+            multiplexer16(
+                0, 0, 0, 0, 0, 0, 0, 0,
+                0, register_b_Q[i], 0, imm[i], 0, 0, 0, 0,
+                opecode[0], opecode[1], opecode[2], opecode[3]
+            )
+            for i in range(4)
+        ]
+
+        print("CF         :", next_cf)
+        print("register_A :", next_a)
+        print("register_B :", next_b)
+        print("IP         :", next_ip)
         return next_a, next_b, next_cf, next_ip, next_out
+
+    # 4bit加算器
+    # 論理ゲートを用いた実装は今回省略
+    def Add(self, x, y):
+        x_int = int("0b" + "".join([str(i) for i in x]), 0)
+        y_int = int("0b" + "".join([str(i) for i in y]), 0)
+        result_int = x_int + y_int
+        if result_int >= 16:
+            cf = 1
+            result = bin(result_int - 16)
+            result = [int(i) for i in format(int(result, 2), "04b")]
+        else:
+            cf = 0
+            result = bin(result_int)
+            result = [int(i) for i in format(int(result, 2), "04b")]
+        return cf, result

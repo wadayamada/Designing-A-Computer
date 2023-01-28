@@ -1,6 +1,9 @@
 # Designing-A-Computer
 論理ゲートを使ってコンピュータを作ります
 
+## 概要図
+<img width="729" alt="スクリーンショット 2023-01-29 3 47 34" src="https://user-images.githubusercontent.com/31792905/215285437-1548797f-ef25-40b1-ab16-c46dda9b5948.png">
+
 ## 命令セット(TD4)
 |  opecode  |  アセンブラ  | 概要　|
 | ---- | ---- |----|

@@ -1,4 +1,4 @@
-from multiplexer import multiplexer4
+from multiplexer import multiplexer4, multiplexer16, multiplexer16_8bit
 
 # addr=4bit, data=8bitのROM
 
@@ -28,26 +28,13 @@ class ROM:
         ]
 
     def get_data(self, addr):
-        data = []
-        for i in range(8):
-            data.append(
-                multiplexer4(
-                    multiplexer4(
-                        self.data[0][i], self.data[1][i], self.data[2][i], self.data[3][i], addr[2], addr[3]
-                    ),
-                    multiplexer4(
-                        self.data[4][i], self.data[5][i], self.data[6][i], self.data[7][i], addr[2], addr[3]
-                    ),
-                    multiplexer4(
-                        self.data[8][i], self.data[9][i], self.data[10][i], self.data[11][i], addr[2], addr[3]
-                    ),
-                    multiplexer4(
-                        self.data[12][i], self.data[13][i], self.data[14][i], self.data[15][i], addr[2], addr[3]
-                    ),
-                    addr[0], addr[1]
-                )
-            )
-        return data
+        return multiplexer16_8bit(
+            self.data[0], self.data[1], self.data[2], self.data[3],
+            self.data[4], self.data[5], self.data[6], self.data[7],
+            self.data[8], self.data[9], self.data[10], self.data[11],
+            self.data[12], self.data[13], self.data[14], self.data[15],
+            addr
+        )
 
 
 if __name__ == "__main__":

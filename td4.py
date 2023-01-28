@@ -3,33 +3,21 @@ from rom import ROM
 from multiplexer import multiplexer16, multiplexer
 
 
-class Computer:
-    def __init__(self):
-        self.switch = bin(0000)
-        self.LED = bin(0000)
-
-    def clock(self):
-        pass
-
-    def input(self, switch):
-        self.switch = [int(s) for s in switch]
-        print("input      :", self.switch)
-
-    def output(self):
-        print("output     :", self.LED)
-
 # とりあえず動作する4bitのコンピューター
 
 
-class TD4(Computer):
-    def __init__(self):
-        super().__init__()
+class TD4():
+    def __init__(self, switch):
+        # 入力スイッチ
+        self.switch = [int(s) for s in switch]
+        # 出力LED
+        self.LED = [0, 0, 0, 0]
         # 汎用レジスタ
         self.register_a = [DFF(), DFF(), DFF(), DFF()]
         self.register_b = [DFF(), DFF(), DFF(), DFF()]
-        # フラグレジスタ
+        # キャリーフラグ(CF)
         self.register_cf = DFF()
-        # 命令ポインタ
+        # 命令ポインタ(IP)
         self.register_ip = [DFF(), DFF(), DFF(), DFF()]
         # IOレジスタ
         self.register_out = [DFF(), DFF(), DFF(), DFF()]
